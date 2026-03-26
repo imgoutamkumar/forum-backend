@@ -82,7 +82,7 @@ export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
             user: {
                 select: {
                     id: true,
-                    name:true,
+                    name: true,
                     avatar: true
                 }
             },
@@ -95,13 +95,22 @@ export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
                     media: true // include all media for each block
                 }
             },
+            comments: {
+                orderBy: { createdAt: 'asc' }, // optional, to show comments in order
+                include: {
+                    user: { select: { id: true, name: true, avatar: true } },
+                    replies: {
+                        orderBy: { createdAt: 'asc' }, // optional
+                        include: {
+                            user: { select: { id: true, name: true, avatar: true } },
+                        },
+                    },
 
-            _count: {
-                select: {
-                    likes: true
                 }
-            }
+            },
+            _count: { select: { likes: true } },
         }
+
     });
 
     // Total posts count (for pagination)
