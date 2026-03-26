@@ -82,7 +82,7 @@ export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
             user: {
                 select: {
                     id: true,
-                    username: true,
+                    name:true,
                     avatar: true
                 }
             },
