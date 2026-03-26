@@ -1,0 +1,228 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+model User {
+  id       String  @id @default(uuid())
+  username String  @unique
+  name     String
+  email    String  @unique
+  password String
+  avatarId String?
+  avatar   Media?  @relation(fields: [avatarId], references: [id])
+  bio      String?
+  role     Role    @default(USER)
+
+  threads  Thread[]
+  posts    Post[]
+  likes    Like[]
+  comments Comment[]
+  replies  Reply[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String
+  slug        String  @unique
+  description String?
+
+  threads Thread[]
+
+  createdAt DateTime @default(now())
+}
+
+model Thread {
+  id    String @id @default(uuid())
+  title String
+  slug  String @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  posts Post[]
+  likes Like[]
+  tags  Tag[]
+
+  views    Int     @default(0)
+  isLocked Boolean @default(false)
+  isPinned Boolean @default(false)
+
+  lastPostId     String?
+  lastActivityAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id String @id @default(uuid())
+
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  blocks   PostBlock[]
+  comments Comment[]
+
+  isEdited  Boolean @default(false)
+  isDeleted Boolean @default(false)
+
+  likes Like[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([threadId])
+}
+
+model PostBlock {
+  id String @id @default(uuid())
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  type BlockType
+
+  content String? // TEXT content or caption
+
+  media Media[] // only used for IMAGE/VIDEO blocks
+
+  order Int // sequence in post
+
+  createdAt DateTime @default(now())
+
+  @@unique([postId, order])
+  @@index([postId])
+}
+
+enum BlockType {
+  TEXT
+  IMAGE
+  VIDEO
+}
+
+model Media {
+  id String @id @default(uuid())
+
+  url      String
+  type     MediaType
+  publicId String // for deletion (Cloudinary/S3)
+
+  blockId String
+  block   PostBlock? @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  // User relation (for avatar)
+  userId String
+  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AVATAR
+}
+
+model Like {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  postId String?
+  post   Post?   @relation(fields: [postId], references: [id])
+
+  threadId String?
+  thread   Thread? @relation(fields: [threadId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@unique([userId, threadId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id      String   @id @default(uuid())
+  name    String   @unique
+  threads Thread[]
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  WOW
+  SAD
+}
+
+model Comment {
+  id String @id @default(uuid())
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  content String
+
+  replies Reply[]
+
+  isEdited  Boolean @default(false)
+  isDeleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+}
+
+model Reply {
+  id String @id @default(uuid())
+
+  commentId String
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  content String
+
+  isEdited  Boolean @default(false)
+  isDeleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([commentId])
+}
