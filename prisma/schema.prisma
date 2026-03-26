@@ -21,8 +21,8 @@ model User {
   name     String
   email    String  @unique
   password String
-  avatarId String?
-  avatar   Media?  @relation(fields: [avatarId], references: [id])
+  avatarId String? @unique
+  avatar   Media?  @relation("UserAvatar", fields: [avatarId], references: [id])
   bio      String?
   role     Role    @default(USER)
 
@@ -134,9 +134,7 @@ model Media {
 
   createdAt DateTime @default(now())
 
-  // User relation (for avatar)
-  userId String
-  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAvatar User? @relation("UserAvatar")
 }
 
 enum MediaType {
