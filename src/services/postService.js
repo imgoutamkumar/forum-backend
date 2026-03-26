@@ -39,16 +39,18 @@ export const createPostService = async ({ userId, threadId, blocks }) => {
                     }
                 }
             }
+
+            await tx.thread.update({
+                where: { id: threadId },
+                data: {
+                    lastPostId: post.id,
+                    lastActivityAt: new Date()
+                }
+            });
+
             return post;
         });
 
-        await tx.thread.update({
-            where: { id: threadId },
-            data: {
-                lastPostId: post.id,
-                lastActivityAt: new Date()
-            }
-        });
 
         return {
             success: true,
@@ -62,7 +64,7 @@ export const createPostService = async ({ userId, threadId, blocks }) => {
 };
 
 export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
-    
+
     const skip = (page - 1) * limit;
     const posts = await prisma.post.findMany({
         where: {
