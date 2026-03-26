@@ -32,6 +32,7 @@ export const createPostService = async ({ userId, threadId, blocks }) => {
                         await tx.media.create({
                             data: {
                                 url: media.url,
+                                publicId: media.publicId,
                                 type: media.type,
                                 blockId: createdBlock.id
                             }
@@ -74,7 +75,7 @@ export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
         take: limit,
 
         orderBy: {
-            createdAt: 'asc' // latest posts first
+            createdAt: 'asc'
         },
 
         include: {
