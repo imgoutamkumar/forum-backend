@@ -74,7 +74,7 @@ export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
         take: limit,
 
         orderBy: {
-            createdAt: 'desc' // latest posts first
+            createdAt: 'asc' // latest posts first
         },
 
         include: {
@@ -88,7 +88,7 @@ export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
 
             blocks: {
                 orderBy: {
-                    order: 'desc'
+                    order: 'acs'
                 },
                 include: {
                     media: true // include all media for each block
