@@ -1,4 +1,4 @@
-import { uploadFile } from "../config/cloudinary.js";
+import { deleteUploadedFile, uploadFile } from "../config/cloudinary.js";
 import { createPostService, getPostsByThread } from "../services/postService.js";
 import { getThreadById } from "../services/threadService.js";
 
@@ -27,45 +27,69 @@ export const createPost = async (req, res) => {
         let parsedBlocks;
 
         try {
-            parsedBlocks = typeof blocks === 'string' ? JSON.parse(blocks) : blocks;
+            parsedBlocks = typeof blocks === 'string'
+                ? JSON.parse(blocks)
+                : blocks;
         } catch (err) {
-            return res.status(400).json({ message: 'Invalid blocks format' });
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid blocks format'
+            });
         }
 
-        if (!threadId || !parsedBlocks || !parsedBlocks.length) {
-            return res.status(400).json({ message: 'Invalid request' });
+        if (blocks && !Array.isArray(parsedBlocks)) {
+            return res.status(400).json({
+                success: false,
+                message: 'blocks must be an array of blocks'
+            });
         }
 
-        // Uploaded files
-        // const files = req.files;
+        // -------------------------------
+        // FILE HANDLING (IMPORTANT PART)
+        // -------------------------------
         const fileMap = {};
-        console.log(req.files)
-        for (const file of req.files) {
-            if (!fileMap[file.fieldname]) {
-                fileMap[file.fieldname] = [];
+
+        if (req.files && req.files.length) {
+            for (const file of req.files) {
+                if (!fileMap[file.fieldname]) {
+                    console.log("file.fieldname", file.fieldname)
+                    fileMap[file.fieldname] = [];
+                }
+                fileMap[file.fieldname].push(file);
             }
-            fileMap[file.fieldname].push(file);
         }
 
-        for (let i = 0; i < parsedBlocks.length; i++) {
-            const block = parsedBlocks[i];
+        // Attach uploaded files to blocks
+        if (parsedBlocks && parsedBlocks.length) {
+            for (let i = 0; i < parsedBlocks.length; i++) {
+                const block = parsedBlocks[i];
 
-            if (block.type !== 'TEXT') {
-                const key = `block_${i}`;
+                if (block.type !== 'TEXT') {
+                    console.log("req.files", req.files)
+                    const key = `block_${i}`;
+                    const files = fileMap[key] || [];
+                    console.log("files", files)
+                    if (files.length > 0) {
+                        block.media = [];
 
-                const files = fileMap[key] || [];
+                        const uploadedFiles = []; // store publicIds
 
-                if (files.length > 0) {
-                    block.media = [];
-
-                    for (const file of files) {
-                        const uploadResult = await uploadFile(file, `thread/${threadId}`);
-
-                        block.media.push({
-                            url: uploadResult.secure_url,
-                            type: block.type,
-                            publicId: uploadResult.publicId
-                        });
+                        try {
+                            for (const file of files) {
+                                const uploadResult = await uploadFile(file, `thread/${Date.now()}`);
+                                block.media.push({
+                                    url: uploadResult.url,
+                                    publicId: uploadResult.publicId,
+                                    type: block.type,
+                                });
+                                uploadedFiles.push(uploadResult.publicId);
+                            }
+                        } catch (error) {
+                            console.error("Upload failed, cleaning up:", error);
+                            // delete already uploaded files
+                            await Promise.all(uploadedFiles.map(id => deleteUploadedFile(id)));
+                            throw new Error("FILE_UPLOAD_FAILED");
+                        }
                     }
                 }
             }
