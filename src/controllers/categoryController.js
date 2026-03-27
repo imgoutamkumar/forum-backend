@@ -1,4 +1,4 @@
-import { createCategoryService } from "../services/categoryService.js"
+import { createCategoryService, getAllCategoryService } from "../services/categoryService.js"
 
 export const createCategory = async (req, res) => {
     try {
@@ -37,4 +37,21 @@ export const createCategory = async (req, res) => {
             message: "Something went wrong"
         })
     }
+}
+
+export const getAllCategory = (req, res) => {
+    try {
+        const allCategories = getAllCategoryService()
+        return res.status(200).json({
+            success: true,
+            message: "Category fetched successfully",
+            data: allCategories
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong"
+        })
+    }
+
 }
