@@ -51,8 +51,8 @@ export const createThreadService = async ({
                         data: {
                             postId: post.id,
                             type: block.type,
-                            content:block.content,
-                            order:order
+                            content: block.content,
+                            order: order
                         }
                     });
 
@@ -130,7 +130,14 @@ export const getAllThreadsService = async ({ page = 1, limit = 10 }) => {
             isPinned: true,
             lastPostId: true,
             lastActivityAt: true,
-            createdAt: true
+            createdAt: true,
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    avatar: true
+                }
+            }
         }
     });
 
