@@ -39,19 +39,22 @@ export const createCategory = async (req, res) => {
     }
 }
 
-export const getAllCategory = (req, res) => {
+export const getAllCategory = async (req, res) => {
     try {
-        const allCategories = getAllCategoryService()
+        const categories = await getAllCategoryService();
+
         return res.status(200).json({
             success: true,
-            message: "Category fetched successfully",
-            data: allCategories
-        })
+            message: "Categories fetched successfully",
+            data: categories
+        });
+
     } catch (error) {
+        console.error("Error fetching categories:", error);
+
         return res.status(500).json({
             success: false,
-            message: "Something went wrong"
-        })
+            message: "Internal server error"
+        });
     }
-
-}
+};

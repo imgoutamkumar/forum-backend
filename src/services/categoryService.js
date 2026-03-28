@@ -39,12 +39,11 @@ export const createCategoryService = async (data) => {
 }
 
 export const getAllCategoryService = async () => {
-    const categories = await prisma.category.findMany({
-        select: {
-            id: true,
-            name: true,
-            description: true
-        }
-    })
-    return categories
-}
+  return prisma.category.findMany({
+    select: {
+      id: true,
+      name: true,
+      description: true
+    }
+  });
+};
