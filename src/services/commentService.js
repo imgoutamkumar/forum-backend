@@ -30,6 +30,9 @@ export const getCommentsByPostService = async (postId) => {
             replies: {
                 where: { isDeleted: false },
                 include: {
+                    content: true,
+                    createdAt: true,
+                    updatedAt: true,
                     user: {
                         select: {
                             id: true,
