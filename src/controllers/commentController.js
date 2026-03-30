@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-import { createCommentService, deleteCommentService, getCommentsByPostService, updateCommentService } from "../services/commentService";
+import { createCommentService, deleteCommentService, getCommentsByPostService, updateCommentService } from "../services/commentService.js";
 
 
   // Create comment
