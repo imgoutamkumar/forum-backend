@@ -5,7 +5,7 @@ import { createCommentService, deleteCommentService, getCommentsByPostService, u
   export const createComment=async(req, res) =>{
     try {
       const { postId, content } = req.body;
-      const userId = req.user.id; // assuming auth middleware
+      const userId = req.userId; // assuming auth middleware
 
       const comment = await createCommentService(
         postId,
@@ -26,7 +26,11 @@ import { createCommentService, deleteCommentService, getCommentsByPostService, u
 
       const comments = await getCommentsByPostService(postId);
 
-      res.json(comments);
+      return res.status(200).json({
+            success: true,
+            message: "Comments fetched successfully",
+            data: comments
+        });
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
@@ -37,7 +41,7 @@ import { createCommentService, deleteCommentService, getCommentsByPostService, u
     try {
       const { commentId } = req.params;
       const { content } = req.body;
-      const userId = req.user.id;
+       const userId = req.userId;
 
       const updated = await updateCommentService(
         commentId,
@@ -55,7 +59,7 @@ import { createCommentService, deleteCommentService, getCommentsByPostService, u
   export const deleteComment=async(req, res) =>{
     try {
       const { commentId } = req.params;
-      const userId = req.user.id;
+       const userId = req.userId;
 
       const deleted = await deleteCommentService(
         commentId,
