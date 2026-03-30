@@ -6,6 +6,7 @@ import authRoute from './routes/authRoute.js'
 import threadRoute from "./routes/threadRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
 import postRoute from "./routes/postRoute.js";
+import commentRoute from "./routes/commentRoute.js";
 const app = express();
 const allowedOrigins = [
     "https://yourdomain.com",
@@ -22,6 +23,7 @@ app.use(cors())
 app.use("/users", authRoute);
 app.use("/threads", threadRoute);
 app.use("/category",categoryRoute);
-app.use("/posts",postRoute)
+app.use("/posts",postRoute);
+app.use("/comments", commentRoute);
 
 export default app;
