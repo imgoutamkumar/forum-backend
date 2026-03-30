@@ -1,4 +1,4 @@
-import { createReplyService } from "../services/ReplyService";
+import { createReplyService } from "../services/ReplyService.js";
 
 export const createReply = async (req, res) => {
   try {
