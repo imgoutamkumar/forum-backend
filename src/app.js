@@ -7,6 +7,7 @@ import threadRoute from "./routes/threadRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
 import postRoute from "./routes/postRoute.js";
 import commentRoute from "./routes/commentRoute.js";
+import replyRoute from "./routes/replyRoute.js";
 const app = express();
 const allowedOrigins = [
     "https://yourdomain.com",
