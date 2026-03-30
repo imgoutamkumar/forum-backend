@@ -1,12 +1,12 @@
 import prisma from "../config/prisma.js";
 
 // Create comment
-export const createReplyService = (CommentId, userId, content) => {
+export const createReplyService = (commentId, userId, content) => {
     return prisma.reply.create({
         data: {
-            CommentId,
+            commentId,
             userId,
             content,
-        },
+        }
     });
 }
