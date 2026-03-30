@@ -29,7 +29,8 @@ export const getCommentsByPostService = async (postId) => {
             },
             replies: {
                 where: { isDeleted: false },
-                include: {
+                select: {                 
+                    id: true,
                     content: true,
                     createdAt: true,
                     updatedAt: true,
@@ -37,8 +38,8 @@ export const getCommentsByPostService = async (postId) => {
                         select: {
                             id: true,
                             name: true,
-                            avatar: true
-                        }
+                            avatar: true,
+                        },
                     },
                 },
             },
