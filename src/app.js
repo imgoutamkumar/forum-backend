@@ -25,5 +25,6 @@ app.use("/threads", threadRoute);
 app.use("/category",categoryRoute);
 app.use("/posts",postRoute);
 app.use("/comments", commentRoute);
+app.use("/replies", replyRoute);
 
 export default app;
