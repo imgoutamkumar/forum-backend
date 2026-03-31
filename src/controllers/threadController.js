@@ -121,9 +121,9 @@ export const createThread = async (req, res) => {
 
 export const getAllThreads = async (req, res) => {
     try {
-        const { page, limit } = req.query;
+        const { page, limit, search } = req.query;
 
-        const result = await getAllThreadsService({ page, limit });
+        const result = await getAllThreadsService({ page, limit, search });
 
         return res.status(200).json({
             success: true,

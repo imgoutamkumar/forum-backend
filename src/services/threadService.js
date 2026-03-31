@@ -107,7 +107,7 @@ export const getThreadById = async (threadId) => {
     return thread;
 };
 
-export const getAllThreadsService = async ({ page = 1, limit = 10 }) => {
+export const getAllThreadsService = async ({ page = 1, limit = 10, search = '' }) => {
     page = Number(page) || 1;
     limit = Number(limit) || 10;
 
@@ -115,8 +115,31 @@ export const getAllThreadsService = async ({ page = 1, limit = 10 }) => {
 
     const skip = (page - 1) * limit;
 
+    // Build dynamic filter
+    const where = search
+        ? {
+            OR: [
+                {
+                    title: {
+                        contains: search,
+                        mode: 'insensitive' // case-insensitive search
+                    }
+                },
+                {
+                    user: {
+                        name: {
+                            contains: search,
+                            mode: 'insensitive'
+                        }
+                    }
+                }
+            ]
+        }
+        : {};
+
     // Fetch threads with only required fields
     const threads = await prisma.thread.findMany({
+        where,
         skip,
         take: limit,
         orderBy: {
