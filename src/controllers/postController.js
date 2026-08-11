@@ -120,6 +120,7 @@ export const createPost = async (req, res) => {
 export const getPostsByThreadId = async (req, res) => {
     try {
         const { threadId } = req.params;
+        const userId = req.userId;
         const { page = 1, limit = 10 } = req.query;
         if (limit > 50) limit = 50;
 
@@ -133,6 +134,7 @@ export const getPostsByThreadId = async (req, res) => {
 
 
         const result = await getPostsByThread({
+            userId,
             threadId,
             page: Number(page),
             limit: Number(limit)

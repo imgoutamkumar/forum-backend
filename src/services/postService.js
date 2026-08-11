@@ -64,7 +64,7 @@ export const createPostService = async ({ userId, threadId, blocks }) => {
     }
 };
 
-export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
+export const getPostsByThread = async ({ userId, threadId, page = 1, limit = 10 }) => {
 
     const skip = (page - 1) * limit;
     const posts = await prisma.post.findMany({
@@ -108,7 +108,15 @@ export const getPostsByThread = async ({ threadId, page = 1, limit = 10 }) => {
 
                 }
             },
-            _count: { select: { likes: true } },
+            _count: {
+                select: { likes: true },
+            },
+            likes: {
+                where: {
+                    userId: userId,
+                },
+                select: { id: true },
+            },
         }
 
     });
@@ -159,6 +167,15 @@ export const updatePostService = async ({ postId, threadId, blocks }) => {
                     });
                 }
             }
+
+            // Add this right before step 3:
+            // Move existing orders out of the way to prevent Unique Constraint errors during swap
+            await tx.postBlock.updateMany({
+                where: { postId: postId },
+                data: {
+                    order: { decrement: 1000 }
+                }
+            });
 
             // 3. UPSERT blocks
             for (let i = 0; i < blocks.length; i++) {
